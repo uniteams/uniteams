@@ -124,7 +124,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 if DEBUG:
     try:
-        from uniteams.localsettings import *
+        from uniteams.local_settings import *
     except ImportError:
         print('Could not import local settings.')
     else:
