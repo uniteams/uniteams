@@ -121,6 +121,8 @@ dmypy.json
 local_settings.py
 
 ##### FRONTEND #####
+###	IDE phpShtorm ###
+.idea
 
 ### Nuxt.js Vue.js ###
 # dependencies
