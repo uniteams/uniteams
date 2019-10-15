@@ -341,7 +341,7 @@ template {
   display: flex;
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
-  justify-content: space-between;
+  justify-content: space-around
   padding-top: 63px;
 }
 .button {
@@ -372,4 +372,29 @@ template {
 }
 a.button{
   display: flex;
+}
+.logo {
+    position: relative
+}
+
+.small_logo {
+    z-index: 2;
+}
+
+.big_logo {
+    z-index: 1;
+}
+
+.padding_site {
+      padding-left: 98px;
+      padding-right: 98px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: inherit;
+}
+
+.slider {
+    
 }
