@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main'
+    # 'django_filters',
+    'rest_framework',
+    'authapp',
+    'main',
 ]
 
 MIDDLEWARE = [
@@ -115,11 +118,56 @@ USE_L10N = True
 USE_TZ = True
 
 
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'authapp.handlers.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authapp.backends.JWTAuthentication',
+
+    ),
+
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+}
+
+# Время жизни токена в днях
+EXP_TOKEN = 365
+
+SWAGGER_SETTINGS = {
+    'APIS_SORTER': 'alpha',
+    'api_version': '0.1',
+    'enabled_methods': [
+        'get',
+        'post',
+        'put',
+        'delete',
+    ],
+    'SECURITY_DEFINITIONS': {
+        "api_key": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT authorization"
+        },
+    },
+    'USE_SESSION_AUTH': False,
+    'SHOW_REQUEST_HEADERS': True,
+    'JSON_EDITOR': True
+}
+
+AUTH_USER_MODEL = 'authapp.UniteamsUser'
+
+LOGIN_URL = 'authapp:login'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 if DEBUG:
