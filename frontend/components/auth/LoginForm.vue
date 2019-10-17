@@ -1,24 +1,101 @@
 <template>
   <div class="login">
-    <form>
-      <h3>Sign-up</h3>
-      <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-               placeholder="Enter email">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-      </div>
-      <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-      </div>
-      <button type="submit" class="btn btn-primary">Sign up</button>
-      <div class="p-2">
-        <nuxt-link no-prefetch to="/users/sign-in/registration/">or registration</nuxt-link>
-      </div>
-    </form>
+
+    <h3>Sign-up</h3>
+    <div class="form-group">
+      <label for="exampleInputEmail1">Login</label>
+      <input v-model="login"
+             type="text"
+             v-bind:class="{ 'is-invalid': isHaveError.login }"
+             class="form-control"
+             id="exampleInputEmail1"
+             aria-describedby="emailHelp"
+             placeholder="Enter login">
+      <div v-if="isHaveError.login" class="invalid-feedback">{{ isHaveError.login }}</div>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1">Password</label>
+      <input v-model="password"
+             type="password"
+             v-bind:class="{ 'is-invalid': isHaveError.password }"
+             class="form-control"
+             id="exampleInputPassword1"
+             placeholder="Password">
+      <div v-if="isHaveError.password" class="invalid-feedback">{{ isHaveError.password }}</div>
+    </div>
+    <button @click="sendForm()" type="submit" class="btn btn-primary">Sign up</button>
+    <div class="p-2">
+      <nuxt-link no-prefetch to="/users/sign-in/registration/">or registration</nuxt-link>
+    </div>
+
   </div>
 </template>
+
+<script>
+    export default {
+        // Содаём модль данных
+        data() {
+            return {
+                login: '',   // Модель
+                password: '',
+                isHaveError: {
+                    login: false,
+                    password: false
+                },
+                lockButton: false // Блокировка повторного нажатия
+            }
+        },
+        // Как только компонент загрузился см. жизненый цикл компонента nuxt.js
+        mounted() {
+
+        },
+        // Методы, которые мы моржем вызывать Пример:  @click="sendForm()"
+        methods: {
+            // Обрабатываем данные формы
+            sendForm() {
+                // Блокировка повторного нажатия
+                if (this.lockButton) {
+                    return false;
+                }
+
+                this.isHaveError = {
+                    login: false,
+                    password: false
+                };
+
+                // Валидация, метод в утилитах /static/js/utilities.js
+                if (!validate(this.login, '!empty')) {
+                    this.isHaveError.login = 'Введите корректный адрес почты'; // TODO i18n
+                }
+                if (!validate(this.password, 'password')) {
+                    this.isHaveError.password = 'Введите пароль'; // TODO i18n
+                }
+
+                // Если нет ошибок отправляем
+                if (!this.isHaveError.email && !this.isHaveError.password) {
+                    this.lockButton = true; // Блокируем
+                    this.doLogin();
+                }
+            },
+            doLogin() {
+                this.$axios.$post(API + '/user/singin/', {
+                    login: this.login,
+                    password: this.password
+                })
+                    .then((responses)=>{
+                        // TODO Сделать редирект на страницу профиля при успешной авторизаци
+                        console.log(responses);
+                        this.lockButton = false; // Разблокируем
+                    })
+                    .catch((error) => {
+                        // TODO Отработать ошибку
+                        console.log(error);
+                        this.lockButton = false; // Разблокируем
+                    });
+            }
+        }
+    }
+</script>
 
 <style>
 

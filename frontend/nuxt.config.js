@@ -11,6 +11,9 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ],
+    script: [
+      {src: '/js/utilities.js'}
     ]
   },
   /*
@@ -25,6 +28,12 @@ module.exports = {
   /*
   ** Build configuration
   */
+  modules: [
+    '@nuxtjs/axios',
+  ],
+  axios: {
+    // proxyHeaders: false
+  },
   build: {
     /*
     ** Run ESLint on save
