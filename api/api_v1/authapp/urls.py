@@ -4,8 +4,8 @@ from rest_framework import routers
 
 from api_v1.authapp.views import (RegistrationAPIView, LoginAPIView, UserViewSet)
 
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
+# router = routers.DefaultRouter()
+# router.register(r'users', UserViewSet)
 
 app_name = 'authapp'
 
