@@ -6,10 +6,10 @@ from rest_framework.schemas import AutoSchema
 class UniteamsUsersSchema(AutoSchema):
     def get_description(self, path, method):
 
-        if path == '/auth/signup/':
-            return 'Создание нового пользователя.'
-        if path == '/api/auth/signin/':
-            return 'Авторизация по логину и паролю.'
+        if path == '/api/v1/auth/registration/':
+            return ''
+        if path == '/api/v1/auth/login/':
+            return ''
 
         return None
 

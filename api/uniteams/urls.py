@@ -23,5 +23,6 @@ from uniteams import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls'), name='main'),
+    path('api/v1/', include('api_v1.urls', namespace='api_v1')),
     path('auth/', include('authapp.urls', namespace='auth'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
