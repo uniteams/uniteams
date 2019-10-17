@@ -1,23 +1,36 @@
-from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework import status, viewsets, authentication, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authapp.models import UniteamsUser
 from api_v1.authapp.renderers import (RegistrationJSONRenderer, UserJSONRenderer, )
-from api_v1.authapp.serializers import (RegistrationSerializer, LoginSerializer, UniteamsUserSerializer)
+from api_v1.authapp.serializers import (RegistrationSerializer, LoginSerializer, UniteamsUsersSerializer)
 
-from api_v1.schemas import UniteamsUsersSchema
+# from api_v1.schemas import UniteamsUsersSchema
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = UniteamsUser.objects.all().order_by('-date_joined')
-    serializer_class = UniteamsUserSerializer
+class ListUsersAPIView(APIView):
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only admin users are able to access this view.
+    """
+    # schema =
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request):
+        """
+        Return a list of all users.
+        """
+        usernames = [user.username for user in UniteamsUser.objects.all()]
+        return Response(usernames, status=status.HTTP_200_OK)
 
 
 class RegistrationAPIView(APIView):
-    schema = UniteamsUsersSchema()
-    permission_classes = (AllowAny,)
+    # schema = UniteamsUsersSchema()
+    permission_classes = (permissions.AllowAny,)
     renderer_classes = (RegistrationJSONRenderer,)
     serializer_class = RegistrationSerializer
 
@@ -33,8 +46,8 @@ class RegistrationAPIView(APIView):
 
 
 class LoginAPIView(APIView):
-    schema = UniteamsUsersSchema()
-    permission_classes = (AllowAny,)
+    # schema = UniteamsUsersSchema()
+    permission_classes = (permissions.AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
 

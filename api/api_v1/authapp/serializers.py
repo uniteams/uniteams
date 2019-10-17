@@ -6,7 +6,7 @@ from api_v1.exceptions import UniteamsAPIException
 from authapp.models import UniteamsUser
 
 
-class UniteamsUserSerializer(serializers.HyperlinkedModelSerializer):
+class UniteamsUsersSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UniteamsUser
         fields = ['url', 'username', 'email', 'groups']
