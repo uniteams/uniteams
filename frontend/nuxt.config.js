@@ -33,6 +33,7 @@ module.exports = {
   ],
   axios: {
     // proxyHeaders: false
+    baseURL: 'http://localhost:8080/api/v1'
   },
   build: {
     /*

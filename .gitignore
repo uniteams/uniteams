@@ -139,3 +139,4 @@ dist
 
 
 package-lock.json
+api/authapp/migrations/0001_initial.py

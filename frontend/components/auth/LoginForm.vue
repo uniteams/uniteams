@@ -1,6 +1,5 @@
 <template>
   <div class="login">
-
     <h3>Sign-up</h3>
     <div class="form-group">
       <label for="exampleInputEmail1">Login</label>
@@ -65,24 +64,26 @@
 
                 // Валидация, метод в утилитах /static/js/utilities.js
                 if (!validate(this.login, '!empty')) {
-                    this.isHaveError.login = 'Введите корректный адрес почты'; // TODO i18n
+                    this.isHaveError.login = 'Введите логин'; // TODO i18n
                 }
+
                 if (!validate(this.password, 'password')) {
                     this.isHaveError.password = 'Введите пароль'; // TODO i18n
                 }
 
+
                 // Если нет ошибок отправляем
-                if (!this.isHaveError.email && !this.isHaveError.password) {
+                if (!this.isHaveError.email && !this.isHaveError.password ) {
                     this.lockButton = true; // Блокируем
                     this.doLogin();
                 }
             },
             doLogin() {
-                this.$axios.$post(API + '/user/singin/', {
+                this.$axios.post('/user/singin/', {
                     login: this.login,
                     password: this.password
                 })
-                    .then((responses)=>{
+                    .then((responses) => {
                         // TODO Сделать редирект на страницу профиля при успешной авторизаци
                         console.log(responses);
                         this.lockButton = false; // Разблокируем

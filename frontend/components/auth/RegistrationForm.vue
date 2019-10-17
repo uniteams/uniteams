@@ -91,19 +91,25 @@
                 if (!validate(this.login, '!empty')) {
                     this.isHaveError.login = 'Введите корректный адрес почты'; // TODO i18n
                 }
+                if (!validate(this.email, 'email')) {
+                    this.isHaveError.email = 'Введите корректный адрес почты'; // TODO i18n
+                }
                 if (!validate(this.password, 'password')) {
                     this.isHaveError.password = 'Введите пароль'; // TODO i18n
                 }
+                if (this.retrypassword !== this.password) {
+                    this.isHaveError.retrypassword = 'Пароли не совпадают'; // TODO i18n
+                }
 
                 // Если нет ошибок отправляем
-                if (!this.isHaveError.email && !this.isHaveError.password) {
+                if (!this.isHaveError.login && !this.isHaveError.password && !this.isHaveError.retrypassword && !this.isHaveError.email) {
                     this.lockButton = true; // Блокируем
                     this.doLogin();
                 }
 
             },
             doLogin() {
-                this.$axios.$post(API + '/user/registration/', {
+                this.$axios.$post('/user/registration/', {
 
                 })
                     .then((responses)=>{
