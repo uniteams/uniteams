@@ -1,7 +1,7 @@
 from rest_framework.exceptions import APIException
 
 
-class UniteamsAuthException(APIException):
+class UniteamsAPIException(APIException):
     default_detail = 'undefined'
     default_code = 'undefined'
 

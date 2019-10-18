@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import authentication
 
 from authapp.models import UniteamsUser
-from authapp.exceptions import UniteamsAuthException
-from authapp import errorcodes
+from api_v1.exceptions import UniteamsAPIException
+from api_v1.authapp import errorcodes
 
 UserModel = get_user_model()
 
@@ -43,16 +43,16 @@ class JWTAuthentication(authentication.BaseAuthentication):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
         except jwt.InvalidTokenError:
-            raise UniteamsAuthException(**errorcodes.ERR_INVALID_TOKEN)
+            raise UniteamsAPIException(**errorcodes.ERR_INVALID_TOKEN)
 
         dt_exp = datetime.fromtimestamp(int(payload['exp']))
         if dt_exp < datetime.now():
-            raise UniteamsAuthException(**errorcodes.ERR_TOKEN_OUT_OF_DATE)
+            raise UniteamsAPIException(**errorcodes.ERR_TOKEN_OUT_OF_DATE)
         try:
             user = UniteamsUser.objects.get(pk=payload['user_id'])
         except UniteamsUser.DoesNotExist:
-            raise UniteamsAuthException(**errorcodes.ERR_TOKEN_NOT_SEARCH_USER)
+            raise UniteamsAPIException(**errorcodes.ERR_TOKEN_NOT_SEARCH_USER)
 
         if not user.is_active:
-            raise UniteamsAuthException(**errorcodes.ERR_TOKEN_NOT_SEARCH_USER)
+            raise UniteamsAPIException(**errorcodes.ERR_TOKEN_NOT_SEARCH_USER)
         return user, token

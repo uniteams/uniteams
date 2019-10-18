@@ -1,15 +1,12 @@
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 
-from django.contrib.auth import authenticate
-
-from authapp import errorcodes
-from authapp.exceptions import UniteamsAuthException
-
-from authapp.models import UniteamsUser, Company
+from api_v1.authapp import errorcodes
+from api_v1.exceptions import UniteamsAPIException
+from authapp.models import UniteamsUser
 
 
-
-class UniteamsUserSerializer(serializers.HyperlinkedModelSerializer):
+class UniteamsUsersSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UniteamsUser
         fields = ['url', 'username', 'email', 'groups']
@@ -24,15 +21,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         model_class = self.Meta.model
         if model_class.objects.filter(username=value).exists():
-            raise UniteamsAuthException(**errorcodes.ERR_LOGIN_ALREADY_EXIST)
+            raise UniteamsAPIException(**errorcodes.ERR_LOGIN_ALREADY_EXIST)
         if len(value) < 3 or len(value) > 19:
-            raise UniteamsAuthException(**errorcodes.ERR_WRONG_LOGIN)
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN)
         return value
 
     @staticmethod
     def validate_password(value):
         if len(value) != 64:
-            raise UniteamsAuthException(**errorcodes.ERR_WRONG_PASSWORD)
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_PASSWORD)
         return value
 
     class Meta:
@@ -55,14 +52,14 @@ class LoginSerializer(serializers.Serializer):
         password = data.get('password', None)
 
         if username is None:
-            raise UniteamsAuthException(**errorcodes.ERR_WRONG_LOGIN)
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN)
         if password is None:
-            raise UniteamsAuthException(**errorcodes.ERR_WRONG_PASSWORD)
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_PASSWORD)
 
         user = authenticate(username=username, password=password)
 
         if user is None:
-            raise UniteamsAuthException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
 
         return {
             'token': user.token

@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django_filters',
     'rest_framework',
+    # 'rest_framework_swagger',
+    'api_v1',
     'authapp',
     'main',
 ]
@@ -119,10 +120,10 @@ USE_TZ = True
 
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'authapp.handlers.core_exception_handler',
+    'EXCEPTION_HANDLER': 'api_v1.handlers.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'authapp.backends.JWTAuthentication',
+        'api_v1.authapp.backends.JWTAuthentication',
 
     ),
 
@@ -131,30 +132,30 @@ REST_FRAMEWORK = {
     ),
 }
 
-# Время жизни токена в днях
+# Lifetime of token (days)
 EXP_TOKEN = 365
 
-SWAGGER_SETTINGS = {
-    'APIS_SORTER': 'alpha',
-    'api_version': '0.1',
-    'enabled_methods': [
-        'get',
-        'post',
-        'put',
-        'delete',
-    ],
-    'SECURITY_DEFINITIONS': {
-        "api_key": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "JWT authorization"
-        },
-    },
-    'USE_SESSION_AUTH': False,
-    'SHOW_REQUEST_HEADERS': True,
-    'JSON_EDITOR': True
-}
+# SWAGGER_SETTINGS = {
+#     'APIS_SORTER': 'alpha',
+#     'api_version': '0.1',
+#     'enabled_methods': [
+#         'get',
+#         'post',
+#         'put',
+#         'delete',
+#     ],
+#     'SECURITY_DEFINITIONS': {
+#         "api_key": {
+#             "type": "apiKey",
+#             "name": "Authorization",
+#             "in": "header",
+#             "description": "JWT authorization"
+#         },
+#     },
+#     'USE_SESSION_AUTH': False,
+#     'SHOW_REQUEST_HEADERS': True,
+#     'JSON_EDITOR': True
+# }
 
 AUTH_USER_MODEL = 'authapp.UniteamsUser'
 
