@@ -1,0 +1,194 @@
+---
+swagger: "2.0"
+info:
+  description: Описание АИП Uniteams
+  version: "1"
+  title: Uniteams API
+host: 127.0.0.1:8000
+basePath: /api/v1/
+tags:
+  - name: User&Users
+produces:
+  - application/json
+paths:
+  /auth/users:
+    get:
+      summary: TODO Получаем список пользователей
+      parameters:
+        - name: parameter_name
+          in: query
+          description: TODO
+          required: false
+          type: string
+      responses:
+        200:
+          description: Возвращает список пользователей
+          schema:
+            $ref: '#/definitions/UsersArray'
+        400:
+          description: Выборка пуста
+        401:
+          description: Доступ запрещён
+  /auth/login:
+    post:
+      summary: Авторизация пользователя
+      parameters:
+        - name: username
+          in: formData
+          required: true
+          type: string
+        - name: password
+          in: formData
+          required: true
+          type: string
+      responses:
+        200:
+          description: Пользователь авторизирован
+          schema:
+            $ref: '#/definitions/User'
+        401:
+          description: Пользователь не авторизован
+  /auth/registration:
+    post:
+      summary: Регистрация пользователя
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: Пользователь.
+          schema:
+            type: object
+            required:
+              - username
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              retryPassword:
+                type: string
+      #        - in: formData
+      #          name: username
+      #          description: Уникальный логин пользователя
+      #          required: true
+      #          type: string
+      #        - name: email
+      #          in: formData
+      #          description: Почта пользователя
+      #          required: true
+      #          type: string
+      #        - name: password
+      #          in: formData
+      #          description: Пароль
+      #          required: true
+      #          type: string
+      #        - name: retryPassword
+      #          in: formData
+      #          description: Повтор пароля
+      #          required: true
+      #          type: string
+      responses:
+        200:
+          description: Регистрация успешна
+          schema:
+            $ref: '#/definitions/User'
+        403:
+          description: Логин занят, регистрация невозможна
+  /auth/user/{id}:
+    get:
+      summary: Получаем профиль пользователя по ID
+      parameters:
+        - name: id
+          in: path
+          description: ID потльзователя
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: Профил пользователя
+          schema:
+            $ref: '#/definitions/UserProfile'
+        403:
+          description: Профил пользователя недоступен
+          schema:
+            $ref: '#/definitions/ErrorMsg'
+    put:
+      summary: Обновляем поля пользователя
+      parameters:
+        - name: id
+          in: path
+          description: ID потльзователя
+          required: true
+          type: integer
+          minimum: 1
+      responses:
+        200:
+          description: Профил пользователя обновлён
+        403:
+          description: Нет прав на изменение профиля
+          schema:
+            $ref: '#/definitions/ErrorMsg'
+definitions:
+  User:
+    type: object
+    required:
+      - username
+      - email
+    properties:
+      id:
+        type: integer
+        example: 123
+        description: Уникальный ID пользователя
+      username:
+        type: string
+        example: mybestlogin
+        description: Уникальный логин пользователя
+      email:
+        type: string
+        example: myname@favoritemail.org
+        description: Email пользователя
+
+  UserProfile:
+    type: object
+    required:
+      - userId
+    properties:
+      userId:
+        type: integer
+        example: 123
+        description: Уникальный ID пользователя
+      firstName:
+        type: string
+        example: Гордон
+        description: Имя в профиле
+      lastName:
+        type: string
+        example: Фримен
+        description: Фамилия в профиле
+      middleName:
+        type: string
+        example: Хедкрабович
+        description: Отчество в профиле
+      gender:
+        type: string
+        example: Муж
+        description: Отчество в профиле
+      position:
+        type: string
+        example: Инженер элементарных частиц
+        description: Должность в профиле
+  UsersArray:
+    type: array
+    items:
+      $ref: '#/definitions/User'
+  ErrorMsg:
+    type: object
+    properties:
+      msg:
+        type: string
+        example: Доступ запрещён
+        description: Исключение сервера или ограничние прав доступа

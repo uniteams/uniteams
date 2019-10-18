@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +12,10 @@
 <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
 <script>
   const ui = SwaggerUIBundle({
-    url: "{% url 'api_v1:openapi-schema' %}",
+    {#url: "{% url 'api_v1:openapi-schema' %}",#}
+    {#url:'http://127:0.0.1:8000/api/v1/',#}
+    {#url: "{% static "openapi/schema.yaml" %}",#}
+    url: "{% static "swagger/schema.yml" %}",
     dom_id: '#swagger-ui',
     presets: [
       SwaggerUIBundle.presets.apis,

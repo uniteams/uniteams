@@ -12,8 +12,8 @@ app_name = 'authapp'
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('users/', ListUsersAPIView.as_view(), name='users'),
-    path('registration/', RegistrationAPIView.as_view(), name='registration'),
-    path('login/', LoginAPIView.as_view(), name='login'),
+    path('users', ListUsersAPIView.as_view(), name='users'),
+    path('registration', RegistrationAPIView.as_view(), name='registration'),
+    path('login', LoginAPIView.as_view(), name='login'),
 
 ]

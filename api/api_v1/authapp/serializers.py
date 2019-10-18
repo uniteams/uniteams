@@ -16,7 +16,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     username = serializers.CharField(write_only=True)
     email = serializers.CharField(write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
+    # token = serializers.CharField(max_length=255, read_only=True)
 
     def validate_username(self, value):
         model_class = self.Meta.model
@@ -28,16 +28,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validate_password(value):
-        if len(value) != 64:
-            raise UniteamsAPIException(**errorcodes.ERR_WRONG_PASSWORD)
+        # if len(value) != 64:
+        #     raise UniteamsAPIException(**errorcodes.ERR_WRONG_PASSWORD)
         return value
 
     class Meta:
         model = UniteamsUser
 
-        fields = ['username', 'email', 'password', 'token']
+        fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
+
         user = UniteamsUser.objects.create_user(**validated_data)
         return user
 
