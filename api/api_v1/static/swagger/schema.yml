@@ -6,20 +6,36 @@ info:
   title: Uniteams API
 host: 127.0.0.1:8000
 basePath: /api/v1/
-tags:
-  - name: User&Users
+
 produces:
   - application/json
+components:
+  securitySchemes:
+    Token:
+      type: http
+      scheme: apiKey
+      in: header
+      name: Authorization
+
 paths:
+
   /auth/users:
     get:
-      summary: TODO Получаем список пользователей
+      tags:
+        - name: Auth
+      summary: Получаем список пользователей
       parameters:
-        - name: parameter_name
-          in: query
-          description: TODO
-          required: false
-          type: string
+        - name: Authorization
+          in: header
+          description: Токен администратора
+          required: true
+
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
+
+      security:
+        - Token: []
       responses:
         200:
           description: Возвращает список пользователей
@@ -31,25 +47,37 @@ paths:
           description: Доступ запрещён
   /auth/login:
     post:
+      tags:
+        - name: Auth
       summary: Авторизация пользователя
+      consumes:
+        - application/json
       parameters:
-        - name: username
-          in: formData
-          required: true
-          type: string
-        - name: password
-          in: formData
-          required: true
-          type: string
+        - in: body
+          name: user
+          description: Пользователь.
+          schema:
+            type: object
+            required:
+              - username
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+      security:
+        - ApiKeyAuth: []
       responses:
         200:
           description: Пользователь авторизирован
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/Token'
         401:
           description: Пользователь не авторизован
   /auth/registration:
     post:
+      tags:
+        - name: Auth
       summary: Регистрация пользователя
       consumes:
         - application/json
@@ -70,26 +98,6 @@ paths:
                 type: string
               retryPassword:
                 type: string
-      #        - in: formData
-      #          name: username
-      #          description: Уникальный логин пользователя
-      #          required: true
-      #          type: string
-      #        - name: email
-      #          in: formData
-      #          description: Почта пользователя
-      #          required: true
-      #          type: string
-      #        - name: password
-      #          in: formData
-      #          description: Пароль
-      #          required: true
-      #          type: string
-      #        - name: retryPassword
-      #          in: formData
-      #          description: Повтор пароля
-      #          required: true
-      #          type: string
       responses:
         200:
           description: Регистрация успешна
@@ -99,6 +107,8 @@ paths:
           description: Логин занят, регистрация невозможна
   /auth/user/{id}:
     get:
+      tags:
+        - name: Auth
       summary: Получаем профиль пользователя по ID
       parameters:
         - name: id
@@ -109,25 +119,27 @@ paths:
           minimum: 1
       responses:
         200:
-          description: Профил пользователя
+          description: Профиль пользователя
           schema:
             $ref: '#/definitions/UserProfile'
         403:
-          description: Профил пользователя недоступен
+          description: Профиль пользователя недоступен
           schema:
             $ref: '#/definitions/ErrorMsg'
     put:
+      tags:
+        - name: Auth
       summary: Обновляем поля пользователя
       parameters:
         - name: id
           in: path
-          description: ID потльзователя
+          description: ID пользователя
           required: true
           type: integer
           minimum: 1
       responses:
         200:
-          description: Профил пользователя обновлён
+          description: Профиль пользователя обновлён
         403:
           description: Нет прав на изменение профиля
           schema:
@@ -185,6 +197,15 @@ definitions:
     type: array
     items:
       $ref: '#/definitions/User'
+
+  Token:
+    type: object
+    required:
+      - Token
+    properties:
+      Token:
+        type: string
+        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2MDI5NjUzMjh9.R52zWTcjK5_MsAfthxXSGdjGIYu6Iq5Rj3ckjFJYFqs
   ErrorMsg:
     type: object
     properties:
@@ -192,3 +213,4 @@ definitions:
         type: string
         example: Доступ запрещён
         description: Исключение сервера или ограничние прав доступа
+

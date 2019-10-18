@@ -68,19 +68,25 @@ ERR_NO_RIGHTS_FOR_ACTION = {
 }
 
 ERR_USER_ALREADY_IN_GROUP = {
-    'code': 100013,
+    'code': 100014,
     'detail': _('User already in group'),
     'status': status.HTTP_400_BAD_REQUEST
 }
 
 ERR_USER_NOT_FOUND = {
-    'code': 100014,
+    'code': 100015,
     'detail': _('User not found'),
     'status': status.HTTP_404_NOT_FOUND
 }
 
 ERR_USER_ALREADY_IN_CONTACT_LIST = {
-    'code': 100014,
+    'code': 100016,
     'detail': _('User already in contacts'),
     'status': status.HTTP_400_BAD_REQUEST
+}
+
+ERR_USER_IS_NOT_ACTIVE = {
+    'code': 100017,
+    'detail': _('User is not active'),
+    'status': status.HTTP_403_FORBIDDEN
 }

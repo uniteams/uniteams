@@ -13,9 +13,7 @@ class UserJSONRenderer(ApiJSONRenderer):
 
 class RegistrationJSONRenderer(ApiJSONRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
-        # print(data)
         token = data.get('token', None)
-        # print(token)
 
         if token is not None and isinstance(token, bytes):
             data['token'] = token.decode('utf-8')

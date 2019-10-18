@@ -12,14 +12,12 @@ from api_v1.authapp import errorcodes
 UserModel = get_user_model()
 
 
-class JWTAuthentication(authentication.BaseAuthentication):
+class JWTAuthentication(authentication.TokenAuthentication):
     authentication_header_prefix = 'Token'
 
     def authenticate(self, request):
         request.user = None
-
         auth_header = authentication.get_authorization_header(request).split()
-
         auth_header_prefix = self.authentication_header_prefix.lower()
 
         if not auth_header:
