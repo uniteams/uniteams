@@ -1,6 +1,4 @@
-import json
-
-from rest_framework import status, viewsets, permissions
+from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -10,17 +8,15 @@ from api_v1.authapp.serializers import (RegistrationSerializer, LoginSerializer,
 
 from api_v1.authapp.backends import JWTAuthentication
 
+
 class ListUsersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAdminUser]
     serializer_class = UniteamsUsersSerializer
 
     def get(self, request):
-        print(request.META)
         username = request.data.get('username', '')
         token = request.data.get('token', '')
-
-        # authentication = self.authentication_classes()
         user = {'username': username, 'token': token}
         serializer = self.serializer_class(data=user)
         if serializer.is_valid(raise_exception=True):
