@@ -12,7 +12,7 @@ from api_v1.authapp.backends import JWTAuthentication
 
 class ListUsersAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    # permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAdminUser]
     serializer_class = UniteamsUsersSerializer
 
     def get(self, request):
