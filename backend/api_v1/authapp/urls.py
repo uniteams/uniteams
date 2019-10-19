@@ -5,10 +5,8 @@ from rest_framework import routers
 from api_v1.authapp.views import (RegistrationAPIView, LoginAPIView, ListUsersAPIView)
 
 router = routers.DefaultRouter()
-# router.register(r'users', ListUsersAPIView)
 
-
-app_name = 'authapp'
+app_name = 'api_auth'
 
 urlpatterns = [
     path('', include(router.urls)),
