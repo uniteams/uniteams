@@ -91,7 +91,7 @@
                     .catch((error) => {
                         // TODO Отработать ошибку
                         this.lockButton = false; // Разблокируе
-                        this.$root.$emit('setMessage', 'Вход не выполнен', 'alert-danger'); // TODO i18n
+                        this.$root.$emit('setMessage', error.response.data.response.detail, 'alert-danger'); // TODO i18n
                     });
             }
         }
