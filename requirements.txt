@@ -7,3 +7,4 @@ Pillow==5.2.0
 PyYAML
 django-cors-headers
 django-rest-swagger
+pysqlite3
