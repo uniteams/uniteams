@@ -11,7 +11,7 @@
     "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint",
-    "ApiRun": "python ../api/manage.py makemigrations && python ../api/manage.py runserver localhost:8080",
+    "ApiRun": "python ../api/manage.py makemigrations && python ../api/manage.py migrate && python ../api/manage.py runserver localhost:8080",
     "ApiInstall": "pip3 install -r ../requirements.txt"
   },
   "dependencies": {

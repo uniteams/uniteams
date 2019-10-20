@@ -109,17 +109,21 @@
 
             },
             doLogin() {
-                this.$axios.$post('/user/registration/', {
-
+                this.$axios.$post('/auth/registration', {
+                    username: this.login,
+                    email: this.email,
+                    password: this.password,
+                    retryPassword:  this.retrypassword
                 })
-                    .then((responses)=>{
+                    .then((responses)=> {
                         // TODO Регистрация успешна
-                        console.log(responses);
+                        this.$root.$emit('setMessage', 'Регистрация успешна', 'alert-success'); // TODO i18n
                         this.lockButton = false; // Разблокируем
                     })
                     .catch((error) => {
                         // TODO Регистрация провалена
-                        console.log(error);
+                        console.log('Error');
+                        this.$root.$emit('setMessage', error.response.data.response.detail, 'alert-danger');
                         this.lockButton = false; // Разблокируем
                     });
             }

@@ -79,19 +79,19 @@
                 }
             },
             doLogin() {
-                this.$axios.post('/user/singin/', {
-                    login: this.login,
+                this.$axios.post('/auth/login', {
+                    username: this.login,
                     password: this.password
                 })
                     .then((responses) => {
                         // TODO Сделать редирект на страницу профиля при успешной авторизаци
-                        console.log(responses);
+                        this.$root.$emit('setMessage', 'Вход выполнен', 'alert-success'); // TODO i18n
                         this.lockButton = false; // Разблокируем
                     })
                     .catch((error) => {
                         // TODO Отработать ошибку
-                        console.log(error);
-                        this.lockButton = false; // Разблокируем
+                        this.lockButton = false; // Разблокируе
+                        this.$root.$emit('setMessage', 'Вход не выполнен', 'alert-danger'); // TODO i18n
                     });
             }
         }

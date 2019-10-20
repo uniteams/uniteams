@@ -10,7 +10,8 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'Nuxt.js project' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet',  href: '/css/bootstrap.min.css' }
     ],
     script: [
       {src: '/js/utilities.js'}
@@ -23,7 +24,7 @@ module.exports = {
   /*
   **/
   css: [
-    '~/node_modules/bootstrap/dist/css/bootstrap.min.css'
+   //'~/node_modules/bootstrap/dist/css/bootstrap.min.css'
   ],
   /*
   ** Build configuration
