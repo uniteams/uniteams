@@ -55,6 +55,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         user = UniteamsUser.objects.create_user(**validated_data)
+        user.generate_activation_key()
         return user
 
 
@@ -80,4 +81,28 @@ class LoginSerializer(serializers.Serializer):
         return {
             'access_token': user.token,
             "token_type": "Bearer",
+        }
+
+
+class VerifySerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
+    activation_key = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        email = data.get('email', '')
+        activation_key = data.get('activation_key', '')
+
+        if email is None or activation_key is None:
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_ACTIVATION_KEY)
+
+        user = UniteamsUser.objects.get(email=email, activation_key=activation_key)
+        if user is None:
+            raise UniteamsAPIException(**errorcodes.ERR_USER_NOT_FOUND)
+        if user.is_active:
+            raise UniteamsAPIException(**errorcodes.ERR_USER_ALREADY_ACTIVATED)
+        if user.is_activation_key_expired:
+            raise UniteamsAPIException(**errorcodes.ERR_ACTIVATION_KEY_EXPIRED)
+        return {
+            'email': user.email,
+            'activation_key': user.activation_key
         }

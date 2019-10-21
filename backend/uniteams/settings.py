@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'phonenumber_field',
     'corsheaders',
     'api_v1',
     'authapp',
@@ -116,6 +117,9 @@ REST_FRAMEWORK = {
 # Lifetime of token (days)
 EXP_TOKEN = 365
 
+# Lifetime of activation key (hours)
+EXP_ACTIVATION_KEY = 48
+
 AUTH_USER_MODEL = 'authapp.UniteamsUser'
 
 LOGIN_URL = 'authapp:login'
@@ -136,3 +140,12 @@ if DEBUG:
         print('Local settings has been imported successfully.')
 
 APPEND_SLASH = False
+
+
+PHONENUMBER_DB_FORMAT = 'INTERNATIONAL'
+PHONENUMBER_DEFAULT_REGION = 'RU'
+
+
+# Email settings
+
+EMAIL_ACTIVATION_KEY_SUBJECT = 'Registration on portal "Uniteams.org"/Activation code'
