@@ -85,7 +85,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class VerifySerializer(serializers.Serializer):
-    email = serializers.EmailField(write_only=True)
+    email = serializers.CharField(write_only=True)
     activation_key = serializers.CharField(write_only=True)
 
     def validate(self, data):

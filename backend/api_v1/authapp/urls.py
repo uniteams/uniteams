@@ -6,7 +6,7 @@ from api_v1.authapp.views import (RegistrationAPIView, LoginAPIView, ListUsersAP
 
 router = routers.DefaultRouter()
 
-app_name = 'api_auth'
+app_name = 'auth'
 
 urlpatterns = [
     path('', include(router.urls)),

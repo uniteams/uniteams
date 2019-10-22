@@ -1,4 +1,5 @@
 from django.core.mail import EmailMessage
+from django.urls import reverse
 
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -45,15 +46,16 @@ class RegistrationAPIView(APIView):
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            print(username)
-
             user = UniteamsUser.objects.get(username=username)
+            send_status = send_email_to_user(user)
 
-            print(user.activation_key)
-            # verify_link = f'{reverse("auth:verify")}?email={user.email}&activation_key={user.activation_key}'
-            # email = EmailMessage(settings.EMAIL_ACTIVATION_KEY_SUBJECT,
-            #                      f'')
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if send_status:
+                message = f'Registration complete. Activate your account to use it. ' \
+                    f'Email with an activation key was successful sent to {user.email}'
+            else:
+                message = f'Registration complete. But activation key was not send.'
+
+            return Response({'message': message}, status=status.HTTP_200_OK)
 
 
 class LoginAPIView(APIView):
@@ -72,15 +74,24 @@ class LoginAPIView(APIView):
 
 class VerifyAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
     serializer_class = VerifySerializer
 
     def get(self, request):
-        email = request.data.get('email', '')
-        activation_key = request.data.get('activation_key', '')
+        data = request.GET
+        email = data.get('email', '')
+        activation_key = data.get('activation_key', '')
         user = {'email': email, 'activation_key': activation_key}
         serializer = self.serializer_class(data=user)
         if serializer.is_valid(raise_exception=True):
-            user = UniteamsUser(serializer.data)
+            user = UniteamsUser.objects.get(**user)
             user.activate()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def send_email_to_user(user):
+    verify_link = f'{reverse("api_v1:auth:verify")}?email={user.email}&activation_key={user.activation_key}'
+    email = EmailMessage(settings.EMAIL_ACTIVATION_KEY_SUBJECT,
+                     f'{verify_link}',
+                     f'{settings.EMAIL_HOST_USER}',
+                     [user.email])
+    return email.send()

@@ -149,3 +149,12 @@ PHONENUMBER_DEFAULT_REGION = 'RU'
 # Email settings
 
 EMAIL_ACTIVATION_KEY_SUBJECT = 'Registration on portal "Uniteams.org"/Activation code'
+
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = '25'
+EMAIL_HOST_USER = 'info@uniteams.org'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_USE_SSL = False
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = 'tmp/email-messages/'
