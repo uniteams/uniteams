@@ -77,7 +77,8 @@ class LoginSerializer(serializers.Serializer):
 
         if user is None:
             raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
-
+        if not user.is_active:
+            raise UniteamsAPIException(**errorcodes.ERR_USER_IS_NOT_ACTIVE)
         return {
             'access_token': user.token,
             "token_type": "Bearer",

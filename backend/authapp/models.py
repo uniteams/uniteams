@@ -1,11 +1,13 @@
 import hashlib
 import random
-from _datetime import datetime, timedelta
+from datetime import datetime, timedelta
 import time
 import jwt
 
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.mail import EmailMessage
+from django.db import models
+from django.urls import reverse
 from django.utils.timezone import now
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -49,6 +51,14 @@ class UniteamsUser(AbstractUser):
         self.activation_key = hashlib.sha1((self.email + salt).encode('utf8')).hexdigest()
         self.save()
         return self.activation_key
+
+    def receive_activation_key(self):
+        verify_link = f'{reverse("api_v1:auth:verify")}?email={self.email}&activation_key={self.activation_key}'
+        email = EmailMessage(settings.EMAIL_ACTIVATION_KEY_SUBJECT,
+                         f'{verify_link}',
+                         f'{settings.EMAIL_HOST_USER}',
+                         [self.email])
+        return email.send()
 
 class UserProfile(models.Model):
     avatar = models.ImageField(upload_to='users/avatars',

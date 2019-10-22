@@ -47,7 +47,7 @@ class RegistrationAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             user = UniteamsUser.objects.get(username=username)
-            send_status = send_email_to_user(user)
+            send_status = user.receive_activation_key()
 
             if send_status:
                 message = f'Registration complete. Activate your account to use it. ' \
@@ -85,13 +85,9 @@ class VerifyAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             user = UniteamsUser.objects.get(**user)
             user.activate()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if user.is_active:
+                message = f'User {user.username} was successful activated!'
+            else:
+                message = f'User {user.username} activation failed'
+            return Response({'message': message}, status=status.HTTP_200_OK)
 
-
-def send_email_to_user(user):
-    verify_link = f'{reverse("api_v1:auth:verify")}?email={user.email}&activation_key={user.activation_key}'
-    email = EmailMessage(settings.EMAIL_ACTIVATION_KEY_SUBJECT,
-                     f'{verify_link}',
-                     f'{settings.EMAIL_HOST_USER}',
-                     [user.email])
-    return email.send()
