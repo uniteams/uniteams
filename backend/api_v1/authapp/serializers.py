@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from api_v1.authapp import errorcodes
@@ -73,12 +74,17 @@ class LoginSerializer(serializers.Serializer):
         if password is None:
             raise UniteamsAPIException(**errorcodes.ERR_WRONG_PASSWORD)
 
-        user = authenticate(username=username, password=password)
-
-        if user is None:
+        try:
+            user = UniteamsUser.objects.get(username=username)
+        except ObjectDoesNotExist:
             raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
         if not user.is_active:
             raise UniteamsAPIException(**errorcodes.ERR_USER_IS_NOT_ACTIVE)
+
+        user = authenticate(username=username, password=password)
+        if user is None:
+            raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
+
         return {
             'access_token': user.token,
             "token_type": "Bearer",
@@ -95,14 +101,16 @@ class VerifySerializer(serializers.Serializer):
 
         if email is None or activation_key is None:
             raise UniteamsAPIException(**errorcodes.ERR_WRONG_ACTIVATION_KEY)
-
-        user = UniteamsUser.objects.get(email=email, activation_key=activation_key)
-        if user is None:
+        try:
+            user = UniteamsUser.objects.get(email=email, activation_key=activation_key)
+        except ObjectDoesNotExist:
             raise UniteamsAPIException(**errorcodes.ERR_USER_NOT_FOUND)
-        if user.is_active:
-            raise UniteamsAPIException(**errorcodes.ERR_USER_ALREADY_ACTIVATED)
-        if user.is_activation_key_expired:
-            raise UniteamsAPIException(**errorcodes.ERR_ACTIVATION_KEY_EXPIRED)
+        else:
+            if user.is_active:
+                raise UniteamsAPIException(**errorcodes.ERR_USER_ALREADY_ACTIVATED)
+            if user.is_activation_key_expired:
+                raise UniteamsAPIException(**errorcodes.ERR_ACTIVATION_KEY_EXPIRED)
+
         return {
             'email': user.email,
             'activation_key': user.activation_key

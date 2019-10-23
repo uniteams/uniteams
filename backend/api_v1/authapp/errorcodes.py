@@ -87,8 +87,8 @@ ERR_USER_ALREADY_IN_CONTACT_LIST = {
 
 ERR_USER_IS_NOT_ACTIVE = {
     'code': 100017,
-    'detail': _('User is not active'),
-    'status': status.HTTP_403_FORBIDDEN
+    'detail': _('This account is inactive'),
+    'status': status.HTTP_400_BAD_REQUEST
 }
 
 ERR_WRONG_ACTIVATION_KEY = {
