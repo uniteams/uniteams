@@ -1,9 +1,10 @@
 PyJWT
 djangorestframework
 django-cors-headers
+django-rest-swagger
+django-phonenumber-field
+phonenumbers
 Django>2.2
 Pillow==5.2.0
 PyYAML
-django-cors-headers
-django-rest-swagger
 pysqlite3
