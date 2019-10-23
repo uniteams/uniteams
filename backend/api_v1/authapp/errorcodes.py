@@ -90,3 +90,22 @@ ERR_USER_IS_NOT_ACTIVE = {
     'detail': _('User is not active'),
     'status': status.HTTP_403_FORBIDDEN
 }
+
+ERR_WRONG_ACTIVATION_KEY = {
+    'code': 100018,
+    'detail': _('User activation failed - wrong email or activation key'),
+    'status': status.HTTP_400_BAD_REQUEST
+}
+
+ERR_USER_ALREADY_ACTIVATED = {
+    'code': 100019,
+    'detail': _('User activation failed - already activated'),
+    'status': status.HTTP_400_BAD_REQUEST
+}
+
+ERR_ACTIVATION_KEY_EXPIRED = {
+    'code': 100020,
+    'detail': _('User activation failed - activation key is expired'),
+    'status': status.HTTP_400_BAD_REQUEST
+}
+
