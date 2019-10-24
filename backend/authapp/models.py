@@ -93,7 +93,8 @@ class UniteamsUser(AbstractUser):
 class UserProfile(models.Model):
     user = models.OneToOneField('UniteamsUser',
                                 related_name='profile',
-                                on_delete=models.CASCADE)
+                                on_delete=models.CASCADE,
+                                null=True)
     first_name = models.CharField(max_length=255,
                                   blank=True)
     last_name = models.CharField(max_length=255,
@@ -125,8 +126,7 @@ class UniteamsTeam(Group):
                                null=True)
     members = models.ManyToManyField('UniteamsUser',
                                      related_name='member_in_group',
-                                     on_delete=models.SET_NULL,
-                                     null=True)
+                                     blank=True)
 
     def __str__(self):
         return f'{self.name} (leader: {self.leader.username})'
@@ -135,20 +135,17 @@ class UniteamsTeam(Group):
 class OrgStruct(Group):
     children = models.ManyToManyField('self',
                                       related_name='child_of',
-                                      on_delete=models.SET_NULL,
-                                      null=True)
+                                      blank=True)
     manager = models.ForeignKey('UniteamsUser',
                                 related_name='manager_in',
                                 on_delete=models.SET_NULL,
                                 null=True)
     deputies = models.ManyToManyField('UniteamsUser',
                                       related_name='deputy_in',
-                                      on_delete=models.SET_NULL,
-                                      null=True)
+                                      blank=True)
     participants = models.ManyToManyField('UniteamsUser',
                                           related_name='participating_in',
-                                          on_delete=models.SET_NULL,
-                                          null=True)
+                                          blank=True)
 
     @property
     def parent(self):
@@ -181,7 +178,8 @@ class Company(models.Model):
 
     employees = models.ManyToManyField('UniteamsUser',
                                        related_name='work_in_companies',
-                                       null=True)
+                                       blank=True
+                                       )
 
     def change_owner(self, new_owner):
         self.owner = new_owner
@@ -207,7 +205,7 @@ class Company(models.Model):
 
 
 @receiver(post_save, sender=UniteamsUser)
-def create_profile(sender, instance, created):
+def create_profile(sender, instance, created, **kwargs):
     if created:
         try:
             user_profile = UserProfile(user=instance)
