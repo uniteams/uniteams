@@ -68,7 +68,8 @@ class UniteamsUser(AbstractUser):
 
     def create_team(self, team_name):
         try:
-            team = UniteamsTeam(name=team_name, leader=self)
+            self.save()
+            team = UniteamsTeam.objects.create(name=team_name, leader=self)
         except Exception as e:
             print(f'Could not create a company: {e}')
             return None
@@ -78,12 +79,13 @@ class UniteamsUser(AbstractUser):
 
     def create_company(self, company_name):
         try:
-            company = Company(company_name=company_name, owner=self, administrator=self)
+            self.save()
+            company = Company.objects.create(company_name=company_name, owner=self)
         except Exception as e:
             print(f'Could not create a company: {e}')
             return None
         else:
-            company.save()
+            # company = Company.objects.get(company_name=company_name)
             return company
 
     def __str__(self):
@@ -191,17 +193,16 @@ class Company(models.Model):
 
     def create_organisation_structure(self, name_of_structure):
         try:
-            org_struct = OrgStruct(name=name_of_structure)
+            self.save()
+            org_struct = OrgStruct.objects.create(name=name_of_structure, org_struct=self)
         except Exception as e:
             print(f'Could not to create org struct: {e}')
             return None
         else:
-            org_struct.save()
-            self.org_struct = org_struct
             return org_struct
 
     def __str__(self):
-        return f'{self.company_name}{f"(owner: {self.owner.username}" if self.owner else "(no owner)"}'
+        return f'{self.company_name}{f" (owner: {self.owner.username})" if self.owner else "(no owner)"}'
 
 
 @receiver(post_save, sender=UniteamsUser)
