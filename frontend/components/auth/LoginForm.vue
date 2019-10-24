@@ -78,7 +78,30 @@
                     this.doLogin();
                 }
             },
-            doLogin() {
+            async doLogin() {
+                try {
+                    await this.$store.dispatch('login', {
+                        username: this.login,
+                        password: this.password
+                    });
+
+                    this.$root.$emit('setMessage', 'Вход выполнен', 'alert-success'); // TODO i18n
+                    this.lockButton = false; // Разблокируем
+
+                } catch (error) {
+
+                    this.lockButton = false; // Разблокируе
+                    console.log(error.response);
+                    if(error.response) {
+                        this.$root.$emit('setMessage', error.response.data.response.detail, 'alert-danger'); // TODO i18n
+                    } else {
+                        this.$root.$emit('setMessage', error, 'alert-danger'); // TODO i18n
+                    }
+
+                }
+
+
+                /*
                 this.$axios.post('/auth/login', {
                     username: this.login,
                     password: this.password
@@ -89,10 +112,17 @@
                         this.lockButton = false; // Разблокируем
                     })
                     .catch((error) => {
+
                         // TODO Отработать ошибку
                         this.lockButton = false; // Разблокируе
-                        this.$root.$emit('setMessage', error.response.data.response.detail, 'alert-danger'); // TODO i18n
+                        console.log(error.response);
+                        if(error.response) {
+                            this.$root.$emit('setMessage', error.response.data.response.detail, 'alert-danger'); // TODO i18n
+                        } else {
+                            this.$root.$emit('setMessage', error, 'alert-danger'); // TODO i18n
+                        }
                     });
+                  */
             }
         }
     }
