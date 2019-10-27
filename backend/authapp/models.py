@@ -88,6 +88,15 @@ class UniteamsUser(AbstractUser):
             # company = Company.objects.get(company_name=company_name)
             return company
 
+    def get_user_profile(self):
+        try:
+            user_profile = UserProfile.objects.get(user=self)
+        except Exception:
+            print('no user profile')
+            return None
+        else:
+            return UserProfile.objects.get(user=self)
+
     def __str__(self):
         return f'{self.username}'
 
@@ -101,17 +110,24 @@ class UserProfile(models.Model):
                                   blank=True)
     last_name = models.CharField(max_length=255,
                                  blank=True)
+    middle_name = models.CharField(max_length=255,
+                                   blank=True)
     avatar = models.ImageField(upload_to='users/avatars',
                                blank=True)
     phone = PhoneNumberField(blank=True)
-    GENDERS = (('M', 'Male'),
-               ('F', 'Female'))
-    gender = models.CharField(max_length=16,
+
+    GENDERS = ((1, 'Male'),
+               (2, 'Female'))
+    gender = models.PositiveSmallIntegerField(
                               choices=GENDERS,
-                              default='M',
+                              default=1,
                               blank=True)
     position = models.CharField(max_length=255,
                                 blank=True)
+
+    @property
+    def user__id(self):
+        return self.user.id
 
     def __str__(self):
         return f'{self.user.username}\'s profile'
@@ -209,7 +225,7 @@ class Company(models.Model):
 def create_profile(sender, instance, created, **kwargs):
     if created:
         try:
-            user_profile = UserProfile(user=instance)
+            user_profile = UserProfile.objects.create(user=instance)
         except Exception as e:
             print(f'Could not create a user profile: {e}')
             return None
@@ -218,3 +234,8 @@ def create_profile(sender, instance, created, **kwargs):
             return user_profile
     else:
         return None
+
+
+@receiver(post_save, sender=UniteamsUser)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()

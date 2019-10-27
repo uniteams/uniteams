@@ -18,8 +18,7 @@ components:
       name: Authorization
 
 paths:
-
-  /auth/users:
+  /users/:
     get:
       tags:
         - name: Auth
@@ -32,7 +31,6 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Token'
-
       security:
         - Token: []
       responses:
@@ -44,7 +42,37 @@ paths:
           description: Выборка пуста
         401:
           description: Доступ запрещён
-  /auth/login:
+    post:
+      tags:
+        - name: Auth
+      summary: Регистрация пользователя
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: Пользователь.
+          schema:
+            type: object
+            required:
+              - username
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Регистрация успешна
+          schema:
+            $ref: '#/definitions/User'
+        403:
+          description: Логин занят, регистрация невозможна
+          schema:
+            $ref: '#/definitions/ErrorMsg'
+  /token/:
     post:
       tags:
         - name: Auth
@@ -73,40 +101,8 @@ paths:
             $ref: '#/definitions/Token'
         401:
           description: Пользователь не авторизован
-  /auth/registration:
-    post:
-      tags:
-        - name: Auth
-      summary: Регистрация пользователя
-      consumes:
-        - application/json
-      parameters:
-        - in: body
-          name: user
-          description: Пользователь.
-          schema:
-            type: object
-            required:
-              - username
-            properties:
-              username:
-                type: string
-              email:
-                type: string
-              password:
-                type: string
-              retryPassword:
-                type: string
-      responses:
-        200:
-          description: Регистрация успешна
-          schema:
-            $ref: '#/definitions/User'
-        403:
-          description: Логин занят, регистрация невозможна
-          schema:
-            $ref: '#/definitions/ErrorMsg'
-  /auth/verify:
+
+  /verification/:
     get:
       tags:
         - name: Auth
@@ -132,18 +128,27 @@ paths:
           description: Неверный адрес электронной почты или код активации
           schema:
             $ref: '#/definitions/ErrorMsg'
-  /auth/user/{id}:
+  /users/{id}:
     get:
       tags:
         - name: Auth
       summary: Получаем профиль пользователя по ID
       parameters:
+        - name: Authorization
+          in: header
+          description: Токен пользователя
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
         - name: id
           in: path
-          description: ID потльзователя
+          description: ID пользователя
           required: true
           type: integer
           minimum: 1
+      security:
+        - Token: []
       responses:
         200:
           description: Профиль пользователя
@@ -158,12 +163,27 @@ paths:
         - name: Auth
       summary: Обновляем поля пользователя
       parameters:
+        - name: Authorization
+          in: header
+          description: Токен пользователя
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
         - name: id
           in: path
           description: ID пользователя
           required: true
           type: integer
           minimum: 1
+        - name: user_profile
+          in: body
+          description: Профиль пользователя
+          schema:
+            type: object
+            $ref: '#/definitions/UserProfile'
+      security:
+        - Token: []
       responses:
         200:
           description: Профиль пользователя обновлён
@@ -197,26 +217,22 @@ definitions:
     required:
       - userId
     properties:
-      userId:
-        type: integer
-        example: 123
-        description: Уникальный ID пользователя
-      firstName:
+      first_name:
         type: string
         example: Гордон
         description: Имя в профиле
-      lastName:
+      last_name:
         type: string
         example: Фримен
         description: Фамилия в профиле
-      middleName:
+      middle_name:
         type: string
         example: Хедкрабович
         description: Отчество в профиле
       gender:
-        type: string
-        example: Муж
-        description: Отчество в профиле
+        type: integer
+        example: 1
+        description: Пол (1 - Мужской, 2 - Женский)
       position:
         type: string
         example: Инженер элементарных частиц
@@ -246,7 +262,7 @@ definitions:
     properties:
       Token:
         type: string
-        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2MDI5NjUzMjh9.R52zWTcjK5_MsAfthxXSGdjGIYu6Iq5Rj3ckjFJYFqs
+        example: token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2MDI5NjUzMjh9.R52zWTcjK5_MsAfthxXSGdjGIYu6Iq5Rj3ckjFJYFqs
   ErrorMsg:
     type: object
     properties:

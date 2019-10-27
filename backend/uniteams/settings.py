@@ -24,9 +24,10 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'phonenumber_field',
     'corsheaders',
-    'api_v1',
     'authapp',
-    'main',
+    'api_v1',
+
+    # 'authapi',
 ]
 
 MIDDLEWARE = [
