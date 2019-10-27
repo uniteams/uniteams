@@ -1,24 +1,24 @@
 from django.contrib.auth import get_user_model
 from rest_framework import status, mixins
 from rest_framework.decorators import permission_classes, authentication_classes
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from api_v1.permissions import IsAuthenticatedOnlySelf
 from authapp.models import UniteamsUser, UserProfile
 from api_v1.authapp.renderers import UserJSONRenderer
 from api_v1.authapp.serializers import RegistrationSerializer, TokenSerializer, UserSerializer, VerifySerializer, \
-    UserDetailSerializer, UserRegisterSerializer, UserListSerializer, UserProfileSerializer
+    UserDetailSerializer, UserRegisterSerializer, UserProfileSerializer, UserListSerializer
 from api_v1.authapp.backends import JWTAuthentication
 
 User = get_user_model()
 
 
-class UsersAPIView(APIView):
+class UsersAPIView(ListAPIView, CreateAPIView):
     queryset = User.objects.order_by(User.USERNAME_FIELD)
-
     @permission_classes((IsAdminUser,))
     @authentication_classes((JWTAuthentication,))
     def get(self, request):
@@ -64,13 +64,12 @@ class UserDetailAPIView(UpdateAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
     @authentication_classes((JWTAuthentication,))
-    @permission_classes((IsAuthenticated,))
+    @permission_classes((IsAuthenticatedOnlySelf,))
     def put(self, request, *args, **kwargs):
         self.kwargs.update({'user__id': self.kwargs.get('pk')})
         return self.update(request, args, kwargs)
 
     def update(self, request, *args, **kwargs):
-        print(request.data)
         instance = self.get_object()
         instance.first_name = request.data.get('first_name', '')
         instance.last_name = request.data.get('last_name', '')

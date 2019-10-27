@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        # list_serializer_class = UserListSerializer
         fields = ['id', 'email', 'username', 'links']
         read_only_fields = ['id', 'email', 'username']
 
@@ -26,13 +27,33 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context['request']
         pk = obj.get('id')
         return {
-            'self': reverse('api-v1:auth:user-detail', kwargs={'pk': pk}, request=request)
+            # 'self': reverse('api-v1:auth:user-detail', kwargs={'pk': pk}, request=request)
         }
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         user.generate_activation_key()
         return user
+
+
+class UserListSerializer(serializers.ListSerializer):
+
+    child = UserSerializer()
+    links = serializers.SerializerMethodField('get_links')
+
+
+    class Meta:
+        model = User
+        fields = ['child', 'links']
+
+    def get_links(self, obj):
+        request = self.context['request']
+        return {
+            'self': reverse('api-v1:auth:users', request=request)
+        }
+
+
+
 
 
 class UserProfileSerializer(mixins.UpdateModelMixin, serializers.ModelSerializer):
@@ -43,7 +64,6 @@ class UserProfileSerializer(mixins.UpdateModelMixin, serializers.ModelSerializer
     gender = serializers.CharField(read_only=True)
     position = serializers.CharField(read_only=True)
     links = serializers.SerializerMethodField('get_links')
-
 
     class Meta:
         model = UserProfile
@@ -61,28 +81,6 @@ class UserProfileSerializer(mixins.UpdateModelMixin, serializers.ModelSerializer
     #     # pk = self.context.get('pk')
     #     user_profile = data
     #     return user_profile
-
-
-
-
-
-class UserListSerializer(serializers.ListSerializer):
-    child = UserSerializer()
-    links = serializers.SerializerMethodField('get_links')
-
-    class Meta:
-        model = User
-        fields = ['child', 'links']
-
-    def get_links(self):
-        request = self.context['request']
-        return {
-            'self': reverse('api-v1:auth:users', request=request)
-        }
-
-    def validate(self, data):
-        print(data)
-        return data
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
