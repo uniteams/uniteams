@@ -12,7 +12,7 @@
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "npm run lint",
     "ApiRun": "python ../backend/manage.py makemigrations && python ../backend/manage.py migrate && python ../backend/manage.py runserver localhost:8080",
-    "ApiInstall": "pip3 install -r ../requirements.txt"
+    "ApiInstall": "pip3 install -r ../requirements.txt",
     "heroku-postbuild": "npm run build"
   },
   "dependencies": {
