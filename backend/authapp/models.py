@@ -122,9 +122,9 @@ class UserProfile(models.Model):
     GENDERS = ((1, 'Male'),
                (2, 'Female'))
     gender = models.PositiveSmallIntegerField(
-                              choices=GENDERS,
-                              default=1,
-                              blank=True)
+        choices=GENDERS,
+        default=1,
+        blank=True)
     position = models.CharField(max_length=255,
                                 blank=True)
 
@@ -219,6 +219,9 @@ class Company(models.Model):
             return None
         else:
             return org_struct
+
+    def get_absolute_url(self):
+        return f'{settings.DOMAIN_NAME}{reverse("api-v1:auth:company-detail", args=[self.pk])}'
 
     def __str__(self):
         return f'{self.company_name}{f" (owner: {self.owner.username})" if self.owner else "(no owner)"}'

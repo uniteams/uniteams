@@ -191,8 +191,147 @@ paths:
           description: Нет прав на изменение профиля
           schema:
             $ref: '#/definitions/ErrorMsg'
-
+  /companies/:
+    get:
+      tags:
+        - name: Auth
+      summary: Получаем список компаний
+      parameters:
+        - name: Authorization
+          in: header
+          description: Токен администратора
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
+      security:
+        - Token: []
+      responses:
+        200:
+          description: Возвращает список компание
+          schema:
+            $ref: '#/definitions/СompaniesArray'
+        400:
+          description: Выборка пуста
+        401:
+          description: Доступ запрещён
+    post:
+      tags:
+        - name: Auth
+      summary: Регистрация компании
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: company
+          description: Компания.
+          schema:
+            type: object
+            required:
+              - company_name
+            properties:
+              company_name:
+                type: string
+      responses:
+        200:
+          description: Компания зарегистрирована
+          schema:
+            $ref: '#/definitions/User'
+        403:
+          description: Имя компании занято, регистрация компании невозможна
+          schema:
+            $ref: '#/definitions/ErrorMsg'
+  /companies/{id}:
+    get:
+      tags:
+        - name: Auth
+      summary: Получаем профиль компании по ID
+      parameters:
+        - name: Authorization
+          in: header
+          description: Токен пользователя
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
+        - name: pk
+          in: path
+          description: ID компании
+          required: true
+          type: integer
+          minimum: 1
+      security:
+        - Token: []
+      responses:
+        200:
+          description: Профиль компании
+          schema:
+            $ref: '#/definitions/Company'
+        403:
+          description: Профиль компании недоступен
+          schema:
+            $ref: '#/definitions/ErrorMsg'
+    put:
+      tags:
+        - name: Auth
+      summary: Обновляем поля компании
+      parameters:
+        - name: Authorization
+          in: header
+          description: Токен пользователя
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
+        - name: pk
+          in: path
+          description: ID компании
+          required: true
+          type: integer
+          minimum: 1
+        - name: owner
+          in: body
+          description: Имя пользователя владельца компании
+          type: string
+        - name: administrator
+          in: body
+          description: Имя пользователя администратора компании
+          type: string
+      security:
+        - Token: []
+      responses:
+        200:
+          description: Профиль пользователя обновлён
+        403:
+          description: Нет прав на изменение профиля
+          schema:
+            $ref: '#/definitions/ErrorMsg'
 definitions:
+  Company:
+    type: object
+    requied:
+      - company_name
+    properties:
+      company_name:
+        type: string
+        example: ООО "Ромашка"
+        description: Имя компании
+      owner:
+        type: object
+        description: Владелец компании
+        $ref: '#/definitions/User'
+      administrator:
+        type: object
+        description: Администратор компании
+        $ref: '#/definitions/User'
+      employees:
+        type: array
+        description: Сотрудники компании
+        $ref: '#/definitions/UsersArray'
+  СompaniesArray:
+    type: array
+    items:
+      $ref: '#/definitions/Company'
   User:
     type: object
     required:
@@ -263,6 +402,8 @@ definitions:
       Token:
         type: string
         example: token eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJleHAiOjE2MDI5NjUzMjh9.R52zWTcjK5_MsAfthxXSGdjGIYu6Iq5Rj3ckjFJYFqs
+
+
   ErrorMsg:
     type: object
     properties:

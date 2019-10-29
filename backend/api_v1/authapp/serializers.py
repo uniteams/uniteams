@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 
 from api_v1.authapp import errorcodes
 from api_v1.exceptions import UniteamsAPIException
-from authapp.models import UserProfile
+from authapp.models import UserProfile, Company
 
 User = get_user_model()
 
@@ -19,7 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
     links = serializers.SerializerMethodField('get_links')
     user = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
-        error_messages={'does_not_exist': 'Invalid category id'},)
+        error_messages={'does_not_exist': 'Invalid category id'}, )
+
     class Meta:
         model = User
         fields = ['user', 'id', 'email', 'username', 'links']
@@ -39,29 +40,9 @@ class UserSerializer(serializers.ModelSerializer):
         user.generate_activation_key()
         return user
 
-    # def validate(self, data):
-    #     # print(self)
-    #     # print(data)
-    #     # print(self.links)
-    #     # pk = self.context.get('pk')
-    #     # data = User.objects.all()
-    #     return data
-
 
 class UserListSerializer(serializers.ListSerializer):
     child = UserSerializer()
-    # links = serializers.SerializerMethodField('get_links')
-
-    # class Meta:
-        # model = User
-        # fields = ['child', 'links']
-
-
-    # def get_links(self, obj):
-    #     request = self.context['request']
-    #     return {
-    #         'self': reverse('api-v1:auth:users', request=request)
-    #     }
 
     def validate_child(self, value):
         print(value)
@@ -69,7 +50,6 @@ class UserListSerializer(serializers.ListSerializer):
 
     def validate(self, attrs):
         return attrs
-
 
 
 class UserProfileSerializer(mixins.UpdateModelMixin, serializers.ModelSerializer):
@@ -224,3 +204,39 @@ class VerifySerializer(serializers.Serializer):
         return True
 
 
+class CompanySerializer(serializers.ModelSerializer):
+    pk = serializers.IntegerField(read_only=True)
+    company_name = serializers.CharField(read_only=True)
+    owner = serializers.CharField(read_only=True)
+    administrator = serializers.CharField(read_only=True)
+    org_struct = serializers.CharField(read_only=True)
+    # employees = serializers.CharField(read_only=True)
+    links = serializers.SerializerMethodField('get_links')
+
+    class Meta:
+        model = Company
+        fields = ['pk', 'company_name', 'owner', 'administrator', 'org_struct', 'links']
+
+    def get_links(self, obj):
+        request = self.context['request']
+        pk = self.context.get('pk')
+        return {
+            'self': reverse('api-v1:auth:company-detail', kwargs={'pk': pk}, request=request),
+            'companies': reverse('api-v1:auth:companies', request=request)
+        }
+
+    def validate(self, data):
+        pk = self.context.get('pk')
+        company = Company.objects.get(pk=pk)
+        return company
+
+
+class CompanyRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['company_name', 'email', 'password']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        user.generate_activation_key()
+        return user
