@@ -125,6 +125,7 @@ AUTH_USER_MODEL = 'authapp.UniteamsUser'
 
 LOGIN_URL = 'authapp:login'
 
+DOMAIN_NAME = 'https://localhost:8000'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http import Http404
 from rest_framework import status, mixins
 from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework.generics import UpdateAPIView, ListAPIView, CreateAPIView
@@ -17,16 +18,23 @@ from api_v1.authapp.backends import JWTAuthentication
 User = get_user_model()
 
 
-class UsersAPIView(ListAPIView, CreateAPIView):
-    queryset = User.objects.order_by(User.USERNAME_FIELD)
+class UsersAPIView(APIView):
+    queryset = User.objects.order_by('username')
+
     @permission_classes((IsAdminUser,))
     @authentication_classes((JWTAuthentication,))
     def get(self, request):
-        users = [{'id': user.id, 'username': user.username, 'email': user.email} for user in self.queryset.all()]
-        serializer = UserListSerializer(data=users, context={'request': request})
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        users = [{'id': user.id,
+                  'username': user.username,
+                  'email': user.email,
+                  'links': user.get_absolute_url()} for user in self.queryset.all()]
+        return Response(users, status=status.HTTP_200_OK)
 
+
+    #
+    # def get_queryset(self):
+    #     self.queryset = User.objects.all()
+    #     return self.queryset
     @permission_classes((AllowAny,))
     def post(self, request):
         username = request.data.get('username', '')
@@ -58,7 +66,7 @@ class UserDetailAPIView(UpdateAPIView):
     @permission_classes((IsAuthenticated,))
     def get(self, request, pk):
         data = {'pk': pk}
-        serializer = UserProfileSerializer(data=data,
+        serializer = self.serializer_class(data=data,
                                            context={'request': request, 'pk': pk})
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -143,3 +151,20 @@ class VerifyAPIView(APIView):
             else:
                 message = f'User {user.username} activation failed'
             return Response({'message': message}, status=status.HTTP_200_OK)
+
+# class ListUsers(APIView):
+#     """
+#     View to list all users in the system.
+#
+#     * Requires token authentication.
+#     * Only admin users are able to access this view.
+#     """
+#     authentication_classes = [authentication.TokenAuthentication]
+#     permission_classes = [permissions.IsAdminUser]
+#
+#     def get(self, request, format=None):
+#         """
+#         Return a list of all users.
+#         """
+#         usernames = [user.username for user in User.objects.all()]
+#         return Response(usernames)

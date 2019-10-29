@@ -15,18 +15,22 @@ class UserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     email = serializers.CharField(read_only=True)
     username = serializers.CharField(read_only=True)
-    links = serializers.SerializerMethodField('get_links')
 
+    links = serializers.SerializerMethodField('get_links')
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        error_messages={'does_not_exist': 'Invalid category id'},)
     class Meta:
         model = User
-        # list_serializer_class = UserListSerializer
-        fields = ['id', 'email', 'username', 'links']
-        read_only_fields = ['id', 'email', 'username']
+        fields = ['user', 'id', 'email', 'username', 'links']
+        read_only_fields = ['user', 'id', 'email', 'username']
 
     def get_links(self, obj):
         request = self.context['request']
+        print(self.context['users'])
         pk = obj.get('id')
         return {
+
             # 'self': reverse('api-v1:auth:user-detail', kwargs={'pk': pk}, request=request)
         }
 
@@ -35,24 +39,36 @@ class UserSerializer(serializers.ModelSerializer):
         user.generate_activation_key()
         return user
 
+    # def validate(self, data):
+    #     # print(self)
+    #     # print(data)
+    #     # print(self.links)
+    #     # pk = self.context.get('pk')
+    #     # data = User.objects.all()
+    #     return data
+
 
 class UserListSerializer(serializers.ListSerializer):
-
     child = UserSerializer()
-    links = serializers.SerializerMethodField('get_links')
+    # links = serializers.SerializerMethodField('get_links')
+
+    # class Meta:
+        # model = User
+        # fields = ['child', 'links']
 
 
-    class Meta:
-        model = User
-        fields = ['child', 'links']
+    # def get_links(self, obj):
+    #     request = self.context['request']
+    #     return {
+    #         'self': reverse('api-v1:auth:users', request=request)
+    #     }
 
-    def get_links(self, obj):
-        request = self.context['request']
-        return {
-            'self': reverse('api-v1:auth:users', request=request)
-        }
+    def validate_child(self, value):
+        print(value)
+        return value
 
-
+    def validate(self, attrs):
+        return attrs
 
 
 
@@ -76,11 +92,11 @@ class UserProfileSerializer(mixins.UpdateModelMixin, serializers.ModelSerializer
             'self': reverse('api-v1:auth:user-detail', kwargs={'pk': pk}, request=request),
             'users': reverse('api-v1:auth:users', request=request)
         }
-    #
-    # def validate(self, data):
-    #     # pk = self.context.get('pk')
-    #     user_profile = data
-    #     return user_profile
+
+    def validate(self, data):
+        pk = self.context.get('pk')
+        user_profile = UserProfile.objects.get(user__id=pk)
+        return user_profile
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -206,3 +222,5 @@ class VerifySerializer(serializers.Serializer):
             if user.is_activation_key_expired:
                 raise UniteamsAPIException(**errorcodes.ERR_ACTIVATION_KEY_EXPIRED)
         return True
+
+
