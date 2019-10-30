@@ -109,3 +109,8 @@ ERR_ACTIVATION_KEY_EXPIRED = {
     'status': status.HTTP_400_BAD_REQUEST
 }
 
+ERR_COMPANY_DOES_NOT_EXIST = {
+    'code': 100030,
+    'detail': _('No company with the name found.'),
+    'status': status.HTTP_404_NOT_FOUND
+}

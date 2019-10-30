@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from api_v1.authapp import errorcodes
+from api_v1.exceptions import UniteamsAPIException
 from api_v1.permissions import IsAuthenticatedOnlySelf
 from authapp.models import UniteamsUser, UserProfile, Company
 from api_v1.authapp.renderers import UserJSONRenderer
@@ -181,7 +183,7 @@ class CompaniesAPIView(APIView):
             return Response({'message': message}, status=status.HTTP_200_OK)
 
 
-class CompanyDetailAPIView(APIView):
+class CompanyDetailAPIView(UpdateAPIView):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
 
@@ -189,7 +191,6 @@ class CompanyDetailAPIView(APIView):
     @permission_classes((IsAuthenticated,))
     def get(self, request, pk):
         data = {'pk': pk}
-
         serializer = self.serializer_class(data=data,
                                            context={'request': request, 'pk': pk})
         if serializer.is_valid(raise_exception=True):
@@ -202,15 +203,11 @@ class CompanyDetailAPIView(APIView):
         return self.update(request, args, kwargs)
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.first_name = request.data.get('first_name', '')
-        instance.last_name = request.data.get('last_name', '')
-        instance.middle_name = request.data.get('middle_name', '')
-        instance.gender = request.data.get('gender', '')
-        instance.position = request.data.get('position', '')
-        instance.save()
-        serializer = self.serializer_class(instance,
-                                           data=request.data,
-                                           context={'request': request, 'pk': self.kwargs.get('pk')})
-        if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data)
+            instance = self.get_object()
+            instance.company_name = request.data.get('company_name', '')
+            instance.save()
+            serializer = self.serializer_class(instance,
+                                               data=request.data,
+                                               context={'request': request, 'pk': self.kwargs.get('pk')})
+            if serializer.is_valid(raise_exception=True):
+                return Response(serializer.data)

@@ -263,7 +263,7 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Token'
-        - name: pk
+        - name: id
           in: path
           description: ID компании
           required: true
@@ -292,20 +292,21 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/Token'
-        - name: pk
+        - name: id
           in: path
           description: ID компании
           required: true
           type: integer
           minimum: 1
-        - name: owner
+        - name: company
           in: body
-          description: Имя пользователя владельца компании
-          type: string
-        - name: administrator
-          in: body
-          description: Имя пользователя администратора компании
-          type: string
+          description: Компания
+          type: object
+          properties:
+            company_name:
+              type: string
+              example: ООО "Ромашка"
+              description: Имя компании
       security:
         - Token: []
       responses:

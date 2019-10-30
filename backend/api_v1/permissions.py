@@ -7,5 +7,5 @@ class IsAuthenticatedOnlySelf(BasePermission):
     """
 
     def has_permission(self, request, view):
-        print(view)
+        print(request)
         return bool(request.user and request.user.is_authenticated)
