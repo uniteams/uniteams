@@ -220,6 +220,24 @@ class Company(models.Model):
         else:
             return org_struct
 
+    def get_administrator(self):
+        if self.administrator:
+            return self.administrator
+        else:
+            return None
+
+    def get_employees(self):
+        for employee in self.employees.all():
+            if employee:
+                return {'username': employee.username,
+                        'first_name': employee.first_name,
+                        'last_name': employee.last_name,
+                        'middle_name': employee.middle_name,
+                        'position': employee.profile.position,
+                        }
+            else:
+                return 'None'
+
     def get_absolute_url(self):
         return f'{settings.DOMAIN_NAME}{reverse("api-v1:auth:company-detail", args=[self.pk])}'
 

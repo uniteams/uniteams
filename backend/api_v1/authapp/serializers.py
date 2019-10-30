@@ -172,11 +172,13 @@ class TokenSerializer(serializers.Serializer):
                 raise UniteamsAPIException(**errorcodes.ERR_USER_IS_NOT_ACTIVE)
 
         user = authenticate(username=username, password=password)
+        print(user.is_authenticated)
         if user is None:
             raise UniteamsAPIException(**errorcodes.ERR_WRONG_LOGIN_OR_PASSWRD)
         return {
             'token': user.token,
             "token_type": "Bearer",
+            'user': user,
         }
 
 
@@ -234,9 +236,11 @@ class CompanySerializer(serializers.ModelSerializer):
 class CompanyRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['company_name', 'email', 'password']
+        fields = ['company_name']
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        user.generate_activation_key()
-        return user
+        request = self.context['request']
+        user = request.user
+        company_name = validated_data.get('company_name')
+        company = user.create_company(company_name=company_name)
+        return company

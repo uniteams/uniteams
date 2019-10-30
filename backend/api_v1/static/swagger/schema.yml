@@ -221,7 +221,16 @@ paths:
       summary: Регистрация компании
       consumes:
         - application/json
+      security:
+        - Token: []
       parameters:
+        - name: Authorization
+          in: header
+          description: Токен администратора
+          required: true
+          schema:
+            type: object
+            $ref: '#/definitions/Token'
         - in: body
           name: company
           description: Компания.

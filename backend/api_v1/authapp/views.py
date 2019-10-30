@@ -12,7 +12,7 @@ from authapp.models import UniteamsUser, UserProfile, Company
 from api_v1.authapp.renderers import UserJSONRenderer
 from api_v1.authapp.serializers import (RegistrationSerializer, TokenSerializer, UserSerializer, VerifySerializer,
                                         UserDetailSerializer, UserRegisterSerializer, UserProfileSerializer,
-                                        UserListSerializer, CompanySerializer)
+                                        UserListSerializer, CompanySerializer, CompanyRegisterSerializer)
 from api_v1.authapp.backends import JWTAuthentication
 
 User = get_user_model()
@@ -154,33 +154,28 @@ class CompaniesAPIView(APIView):
     @permission_classes((IsAuthenticated,))
     @authentication_classes((JWTAuthentication,))
     def get(self, request):
+        user = request.user
         companies = [{'company_name': company.company_name,
                       'owner': company.owner.username,
-                      'administrator': company.administrator.username,
-                      'employees': [{'username': employee.username,
-                                     'first_name': employee.first_name,
-                                     'last_name': employee.last_name,
-                                     'middle_name': employee.middle_name,
-                                     'position': employee.profile.position,
-                                     }
-                                    for employee in company.employees.all()],
+                      'administrator': company.get_administrator(),
+                      'employees': company.get_employees(),
                       'links': {
                           'self': company.get_absolute_url(),
                           'companies': reverse('api-v1:auth:companies', request=request)}}
-                     for company in self.queryset.all()]
+                     for company in self.queryset.filter(owner=user)]
+
         return Response(companies, status=status.HTTP_200_OK)
 
-    @permission_classes((AllowAny,))
+    @permission_classes((IsAuthenticated,))
+    @authentication_classes((JWTAuthentication,))
     def post(self, request):
         company_name = request.data.get('company_name', '')
-        email = request.data.get('email', '')
-        password = request.data.get('password', '')
-        company = {'company_name': company_name, 'email': email, 'password': password}
-        serializer = CompanySerializer(data=company)
+        company = {'company_name': company_name}
+        serializer = CompanyRegisterSerializer(data=company, context={'request':request})
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            company = Company.objects.get(username=company_name)
+            company = Company.objects.get(company_name=company_name)
             message = f'Company {company.company_name} created.'
 
             return Response({'message': message}, status=status.HTTP_200_OK)
@@ -190,12 +185,11 @@ class CompanyDetailAPIView(APIView):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
 
-    # lookup_field = 'user__id'
-
     @authentication_classes((JWTAuthentication,))
     @permission_classes((IsAuthenticated,))
     def get(self, request, pk):
         data = {'pk': pk}
+
         serializer = self.serializer_class(data=data,
                                            context={'request': request, 'pk': pk})
         if serializer.is_valid(raise_exception=True):
